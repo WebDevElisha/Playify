@@ -14,7 +14,7 @@
     }
 
     header {
-      background-color: #d60000; /* strong red */
+      background-color: #d60000;
       color: white;
       padding: 20px;
       font-size: 2em;
@@ -23,14 +23,14 @@
 
     .upload-btn {
       display: inline-block;
-      margin: 40px auto;
-      padding: 20px 60px;
+      margin: 20px auto;
+      padding: 15px 50px;
       font-size: 1.5em;
       font-weight: bold;
       color: white;
       background-color: #d60000;
       border: none;
-      border-radius: 50px; /* pill shape */
+      border-radius: 50px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
@@ -44,21 +44,46 @@
     }
 
     .playlist {
-      margin-top: 30px;
-      text-align: left;
+      margin: 20px auto;
       max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
       border: 2px solid #d60000;
       border-radius: 10px;
-      padding: 20px;
+      padding: 15px;
+      text-align: left;
     }
 
     .playlist h2 {
       color: #d60000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
     }
 
-    /* Popup styling */
+    .playlist ul {
+      display: none;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .playlist ul li {
+      margin: 5px 0;
+    }
+
+    .playlist button {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background-color: #d60000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .playlist button:hover {
+      background-color: #a00000;
+    }
+
     .popup {
       display: none;
       position: fixed;
@@ -95,8 +120,9 @@
       cursor: pointer;
     }
 
-    .popup-content button:hover {
-      background-color: #a00000;
+    audio {
+      margin-top: 20px;
+      width: 100%;
     }
   </style>
 </head>
@@ -105,50 +131,114 @@
 
   <!-- Upload button -->
   <label class="upload-btn" for="fileInput">Upload Files</label>
-  <input type="file" id="fileInput" multiple>
+  <input type="file" id="fileInput" multiple accept="audio/*">
 
-  <!-- Playlist display -->
-  <div class="playlist" id="playlist">
-    <h2 id="playlistName">Untitled Playlist 1</h2>
-    <ul id="fileList"></ul>
-  </div>
+  <!-- Playlists container -->
+  <div id="playlists"></div>
 
   <!-- Popup -->
   <div class="popup" id="popup">
     <div class="popup-content">
       <h3>Name your playlist</h3>
-      <input type="text" id="playlistInput" placeholder="Untitled Playlist 1">
-      <button onclick="savePlaylistName()">Save</button>
+      <input type="text" id="playlistInput" placeholder="Untitled Playlist">
+      <button onclick="savePlaylist()">Save</button>
     </div>
   </div>
 
+  <!-- Audio player -->
+  <audio id="audioPlayer" controls></audio>
+
   <script>
     const fileInput = document.getElementById('fileInput');
-    const fileList = document.getElementById('fileList');
+    const playlistsContainer = document.getElementById('playlists');
     const popup = document.getElementById('popup');
-    const playlistName = document.getElementById('playlistName');
     const playlistInput = document.getElementById('playlistInput');
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    let currentFiles = [];
+    let playlists = [];
+    let currentPlaylistIndex = null;
+    let currentTrackIndex = 0;
 
     fileInput.addEventListener('change', () => {
-      fileList.innerHTML = '';
-      Array.from(fileInput.files).forEach(file => {
-        const li = document.createElement('li');
-        li.textContent = file.name;
-        fileList.appendChild(li);
-      });
-      popup.style.display = 'flex'; // show popup
+      currentFiles = Array.from(fileInput.files);
+      popup.style.display = 'flex';
     });
 
-    function savePlaylistName() {
-      const name = playlistInput.value.trim() || "Untitled Playlist 1";
-      playlistName.textContent = name;
+    function savePlaylist() {
+      const name = playlistInput.value.trim() || `Untitled Playlist ${playlists.length + 1}`;
+      playlists.push({ name, files: currentFiles });
+      renderPlaylists();
       popup.style.display = 'none';
+      playlistInput.value = '';
     }
 
-    // Close popup if clicked outside
-    window.addEventListener('click', (e) => {
-      if (e.target === popup) {
-        popup.style.display = 'none';
+    function renderPlaylists() {
+      playlistsContainer.innerHTML = '';
+      playlists.forEach((playlist, index) => {
+        const div = document.createElement('div');
+        div.className = 'playlist';
+
+        const title = document.createElement('h2');
+        title.textContent = playlist.name;
+        title.onclick = () => {
+          const ul = div.querySelector('ul');
+          ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
+        };
+
+        const ul = document.createElement('ul');
+        playlist.files.forEach((file, i) => {
+          const li = document.createElement('li');
+          li.textContent = `${i + 1}. ${file.name}`;
+          ul.appendChild(li);
+        });
+
+        const playBtn = document.createElement('button');
+        playBtn.textContent = 'Play';
+        playBtn.onclick = () => playPlaylist(index);
+
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add More Files';
+        addBtn.onclick = () => {
+          currentPlaylistIndex = index;
+          fileInput.click();
+        };
+
+        div.appendChild(title);
+        div.appendChild(ul);
+        div.appendChild(playBtn);
+        div.appendChild(addBtn);
+        playlistsContainer.appendChild(div);
+      });
+    }
+
+    function playPlaylist(index) {
+      currentPlaylistIndex = index;
+      currentTrackIndex = 0;
+      playTrack();
+    }
+
+    function playTrack() {
+      const playlist = playlists[currentPlaylistIndex];
+      if (!playlist || currentTrackIndex >= playlist.files.length) return;
+
+      const file = playlist.files[currentTrackIndex];
+      const url = URL.createObjectURL(file);
+      audioPlayer.src = url;
+      audioPlayer.play();
+
+      audioPlayer.onended = () => {
+        currentTrackIndex++;
+        playTrack();
+      };
+    }
+
+    // Handle adding more files
+    fileInput.addEventListener('change', () => {
+      if (currentPlaylistIndex !== null) {
+        playlists[currentPlaylistIndex].files.push(...Array.from(fileInput.files));
+        renderPlaylists();
+        currentPlaylistIndex = null;
       }
     });
   </script>
