@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Beanie Play</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    header {
+      background-color: #d60000; /* strong red */
+      color: white;
+      padding: 20px;
+      font-size: 2em;
+      font-weight: bold;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      margin: 40px auto;
+      padding: 20px 60px;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: white;
+      background-color: #d60000;
+      border: none;
+      border-radius: 50px; /* pill shape */
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-btn:hover {
+      background-color: #a00000;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .playlist {
+      margin-top: 30px;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 2px solid #d60000;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .playlist h2 {
+      color: #d60000;
+    }
+
+    /* Popup styling */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+    }
+
+    .popup-content input {
+      width: 90%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .popup-content button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #d60000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .popup-content button:hover {
+      background-color: #a00000;
+    }
+  </style>
+</head>
+<body>
+  <header>Beanie Play</header>
+
+  <!-- Upload button -->
+  <label class="upload-btn" for="fileInput">Upload Files</label>
+  <input type="file" id="fileInput" multiple>
+
+  <!-- Playlist display -->
+  <div class="playlist" id="playlist">
+    <h2 id="playlistName">Untitled Playlist 1</h2>
+    <ul id="fileList"></ul>
+  </div>
+
+  <!-- Popup -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <h3>Name your playlist</h3>
+      <input type="text" id="playlistInput" placeholder="Untitled Playlist 1">
+      <button onclick="savePlaylistName()">Save</button>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const popup = document.getElementById('popup');
+    const playlistName = document.getElementById('playlistName');
+    const playlistInput = document.getElementById('playlistInput');
+
+    fileInput.addEventListener('change', () => {
+      fileList.innerHTML = '';
+      Array.from(fileInput.files).forEach(file => {
+        const li = document.createElement('li');
+        li.textContent = file.name;
+        fileList.appendChild(li);
+      });
+      popup.style.display = 'flex'; // show popup
+    });
+
+    function savePlaylistName() {
+      const name = playlistInput.value.trim() || "Untitled Playlist 1";
+      playlistName.textContent = name;
+      popup.style.display = 'none';
+    }
+
+    // Close popup if clicked outside
+    window.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        popup.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
