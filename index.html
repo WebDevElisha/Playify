@@ -1,101 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Playify</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
+<meta charset="UTF-8" />
+<title>Playify</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+:root {
+      --bg: #0f0f10;    /* black */
+      --card: #ffffff;  /* white */
+      --red: #d60000;   /* red accent */
       --bg: #0f0f10;
       --card: #ffffff;
       --red: #d60000;
-      --red-d: #a00000;
-      --text: #111111;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
+--red-d: #a00000;
+--text: #111111;
+}
+* { box-sizing: border-box; }
+body {
+margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       font-family: system-ui, sans-serif;
-      background: var(--bg);
-      color: #fff;
-    }
+background: var(--bg);
+color: #fff;
+}
 
-    /* Header */
-    header {
-      height: 64px;
-      background: var(--red);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-weight: 800;
-      font-size: 22px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.35);
-    }
-    .music-icon { width: 28px; height: 28px; }
+    /* Header with music note icon */
+header {
+height: 64px;
+background: var(--red);
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+font-weight: 800;
+font-size: 22px;
+box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+}
+.music-icon { width: 28px; height: 28px; }
 
-    /* Startup */
-    .startup {
-      display: grid;
-      place-items: center;
-      height: calc(100vh - 64px);
-      text-align: center;
-      padding: 16px;
-    }
-    .title-big { font-size: 42px; font-weight: 900; }
-    .subtitle { color: #cfcfcf; margin: 8px 0 18px; }
+    /* Startup screen */
+.startup {
+display: grid;
+place-items: center;
+height: calc(100vh - 64px);
+text-align: center;
+padding: 16px;
+}
+.title-big { font-size: 42px; font-weight: 900; }
+.subtitle { color: #cfcfcf; margin: 8px 0 18px; }
 
     /* Buttons */
-    .pill-btn {
-      padding: 10px 20px;
-      border-radius: 999px;
-      border: none;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .btn-primary { background: var(--red); color: #fff; }
-    .btn-primary:hover { background: var(--red-d); }
-    .btn-secondary { background: #fff; color: var(--red); border: 2px solid var(--red); }
-    .btn-secondary:hover { background: #f6f6f6; }
+.pill-btn {
+padding: 10px 20px;
+border-radius: 999px;
+border: none;
+font-weight: 800;
+cursor: pointer;
+}
+.btn-primary { background: var(--red); color: #fff; }
+.btn-primary:hover { background: var(--red-d); }
+.btn-secondary { background: #fff; color: var(--red); border: 2px solid var(--red); }
+.btn-secondary:hover { background: #f6f6f6; }
 
-    /* Canvas and cards */
-    main.canvas { padding: 20px; max-width: 1100px; margin: 0 auto; }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 16px;
-    }
-    .playlist-card {
-      background: var(--card);
-      color: var(--text);
-      border: 2px solid var(--red);
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-    }
+    /* Canvas and cards (small boxes) */
+main.canvas { padding: 20px; max-width: 1000px; margin: 0 auto; }
+.cards {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 16px;
+}
+.playlist-card {
+background: var(--card);
+color: var(--text);
+border: 2px solid var(--red);
+border-radius: 12px;
+padding: 12px;
+box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
 
-    /* Card header + toggle + rename */
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .card-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card-title { font-weight: 900; color: var(--red); }
-    .rename-btn {
-      background: transparent;
-      border: none;
-      color: var(--red);
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    /* File list */
+    /* Header + dropdown */
+.card-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 6px;
+}
+.card-title { font-weight: 900; color: var(--red); }
+    .file-list { display: none; margin-top: 8px; }
+    .file-item { font-size: 14px; margin: 3px 0; }
     .file-list {
       display: none;
       margin-top: 8px;
@@ -103,491 +95,383 @@
     .file-item {
       font-size: 14px;
       margin: 3px 0;
-      padding: 6px 8px;
+      padding: 4px 6px;
       border-radius: 6px;
-      cursor: move;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      cursor: pointer;
     }
     .file-item:hover {
       background: #000;
       color: #fff;
     }
-    .drag-handle {
-      color: #666;
-      font-size: 14px;
-      cursor: move;
-      user-select: none;
-    }
 
-    /* Controls toolbar (icons) */
-    .card-controls {
-      margin-top: 10px;
-      display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap: 6px;
-      align-items: center;
-    }
-    .icon-btn {
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 2px solid var(--red);
-      background: #fff;
-      color: var(--red);
-      font-weight: 800;
-      cursor: pointer;
-      text-align: center;
-    }
-    .icon-btn.primary {
-      background: var(--red);
-      color: #fff;
-      border-color: var(--red);
-    }
-    .icon-btn:hover { filter: brightness(0.95); }
-
-    /* Player */
-    .player-wrap {
-      max-width: 1000px;
-      margin: 10px auto 30px;
-      text-align: center;
-    }
-    .now-playing { display: none; margin: 10px 0; }
-    audio { display: none; width: 95%; max-width: 1000px; }
-
-    .hidden { display: none !important; }
-
-    /* Popup for naming new playlist */
-    .popup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: grid;
-      place-items: center;
-      z-index: 1000;
-    }
-    .popup-content {
-      background: #fff;
-      color: #111;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      width: 320px;
-    }
-    .popup-content input {
-      width: 92%;
-      padding: 10px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    .popup-actions {
-      margin-top: 14px;
-      display: flex;
-      gap: 10px;
+    /* Controls row */
+.card-controls {
+margin-top: 10px;
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
       justify-content: center;
-    }
-  </style>
+}
+
+    /* Audio + Now playing */
+.player-wrap {
+max-width: 900px;
+margin: 10px auto 30px;
+text-align: center;
+}
+.now-playing { display: none; margin: 10px 0; }
+audio { display: none; width: 95%; max-width: 900px; }
+
+    /* Utility */
+.hidden { display: none !important; }
+</style>
 </head>
 <body>
-  <header>
+<header>
     <svg class="music-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M48 6v36.2c-2.4-1.4-5.2-2.2-8-2.2-7.2 0-13 5.8-13 13s5.8 13 13 13 13-5.8 13-13V18h10V6H48z" fill="#fff"/>
-    </svg>
-    Playify
-  </header>
+    <svg class="music-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+<path d="M48 6v36.2c-2.4-1.4-5.2-2.2-8-2.2-7.2 0-13 5.8-13 13s5.8 13 13 13 13-5.8 13-13V18h10V6H48z" fill="#fff"/>
+</svg>
+Playify
+</header>
 
-  <!-- Startup -->
-  <section class="startup" id="startup">
-    <div>
-      <div class="title-big">Playify</div>
-      <p class="subtitle">Name your playlist and add files to start.</p>
-      <button class="pill-btn btn-primary" id="createPlaylistBtn">Create playlist</button>
-    </div>
-  </section>
+  <!-- Startup screen -->
+<section class="startup" id="startup">
+<div>
+<div class="title-big">Playify</div>
+<p class="subtitle">Create your first playlist to get started.</p>
+<label class="pill-btn btn-primary" for="newFileInput">Create playlist</label>
+</div>
+</section>
 
-  <!-- Canvas -->
-  <main class="canvas">
-    <div class="cards" id="cards"></div>
-  </main>
+  <!-- Main canvas -->
+<main class="canvas">
+<div class="cards" id="cards"></div>
+</main>
 
-  <!-- Hidden file inputs (triggered by buttons) -->
-  <input type="file" id="newFileInput" multiple accept="audio/*" class="hidden" />
-  <input type="file" id="addFileInput" multiple accept="audio/*" class="hidden" />
+  <!-- Global controls (hidden inputs triggered by buttons) -->
+<input type="file" id="newFileInput" multiple accept="audio/*" />
+<input type="file" id="addFileInput" multiple accept="audio/*" />
 
   <!-- Player -->
-  <div class="player-wrap">
-    <p class="now-playing" id="nowPlaying"></p>
-    <audio id="audioPlayer" controls></audio>
-  </div>
+<div class="player-wrap">
+<p class="now-playing" id="nowPlaying"></p>
+<audio id="audioPlayer" controls></audio>
+</div>
+<script>
+    // State
+const startup = document.getElementById('startup');
+const cardsContainer = document.getElementById('cards');
+const newFileInput = document.getElementById('newFileInput');
+const addFileInput = document.getElementById('addFileInput');
+const audioPlayer = document.getElementById('audioPlayer');
+const nowPlaying = document.getElementById('nowPlaying');
 
-  <!-- Name popup -->
-  <div class="popup hidden" id="popup">
-    <div class="popup-content">
-      <h3>Name your playlist</h3>
-      <input type="text" id="playlistInput" placeholder="My Playlist" />
-      <div class="popup-actions">
-        <button class="pill-btn btn-primary" id="savePlaylistBtn">Save</button>
-        <button class="pill-btn btn-secondary" id="cancelPopupBtn">Cancel</button>
-      </div>
-    </div>
-  </div>
-  <script>
-    /* Elements */
-    const startup = document.getElementById('startup');
-    const createPlaylistBtn = document.getElementById('createPlaylistBtn');
-    const cardsContainer = document.getElementById('cards');
-    const newFileInput = document.getElementById('newFileInput');
-    const addFileInput = document.getElementById('addFileInput');
-    const audioPlayer = document.getElementById('audioPlayer');
-    const nowPlaying = document.getElementById('nowPlaying');
-    const popup = document.getElementById('popup');
-    const playlistInput = document.getElementById('playlistInput');
-    const savePlaylistBtn = document.getElementById('savePlaylistBtn');
-    const cancelPopupBtn = document.getElementById('cancelPopupBtn');
-
-    /* State */
-    let playlists = []; // { name, files: File[], loop, shuffle }
-    let currentPlaylistIndex = null;
-    let currentTrackIndex = 0;
+    let playlists = []; // { name, files: File[], loop: boolean }
+    let playlists = [];
+let currentPlaylistIndex = null;
+let currentTrackIndex = 0;
     let shuffledOrder = [];
-    let pendingFiles = [];
 
-    /* LocalStorage (metadata only) */
-    const LS_KEY = 'playify_meta';
-    function saveMeta() {
+    // LocalStorage (metadata only: name + loop)
+const LS_KEY = 'playify_meta';
+
+function saveMeta() {
+      const meta = playlists.map(p => ({ name: p.name, loop: p.loop }));
       const meta = playlists.map(p => ({
-        name: p.name, loop: p.loop, shuffle: p.shuffle
+        name: p.name,
+        loop: p.loop,
+        shuffle: p.shuffle
       }));
-      localStorage.setItem(LS_KEY, JSON.stringify(meta));
-    }
-    function loadMeta() {
-      try {
-        const raw = localStorage.getItem(LS_KEY);
-        return raw ? JSON.parse(raw) : [];
-      } catch { return []; }
-    }
+localStorage.setItem(LS_KEY, JSON.stringify(meta));
+}
 
-    /* Dedup by name|size|lastModified */
+function loadMeta() {
+try {
+const raw = localStorage.getItem(LS_KEY);
+return raw ? JSON.parse(raw) : [];
+} catch {
+return [];
+}
+}
+
+    // Helper: add files uniquely (prevents duplicates by name+size+lastModified)
+    function addUniqueFiles(targetFiles, newFiles) {
+      const seen = new Set(targetFiles.map(f => `${f.name}|${f.size}|${f.lastModified}`));
+      const unique = [];
+      for (const f of newFiles) {
     function addUniqueFiles(existing, incoming) {
       const seen = new Set(existing.map(f => `${f.name}|${f.size}|${f.lastModified}`));
-      const out = [];
-      for (const f of incoming) {
-        const key = `${f.name}|${f.size}|${f.lastModified}`;
-        if (!seen.has(key)) { seen.add(key); out.push(f); }
+      return incoming.filter(f => {
+const key = `${f.name}|${f.size}|${f.lastModified}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          unique.push(f);
+        }
       }
-      return out;
-    }
+      return unique;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+}
 
-    /* Create playlist flow */
-    createPlaylistBtn.addEventListener('click', () => {
-      popup.classList.remove('hidden');
-      playlistInput.value = '';
-      pendingFiles = [];
-      // Immediately ask for files after naming
-    });
+    // Create new playlist
+newFileInput.addEventListener('change', () => {
+const selection = Array.from(newFileInput.files);
+if (selection.length === 0) return;
 
-    savePlaylistBtn.addEventListener('click', () => {
-      const name = playlistInput.value.trim() || `Playlist ${playlists.length + 1}`;
-      popup.classList.add('hidden');
-      // Prompt for files
-      newFileInput.click();
+const unique = addUniqueFiles([], selection);
+const name = `Playlist ${playlists.length + 1}`;
+      playlists.push({ name, files: unique, loop: false });
 
-      const onNewFiles = () => {
-        const selection = Array.from(newFileInput.files);
-        const unique = addUniqueFiles([], selection);
-        playlists.push({ name, files: unique, loop: false, shuffle: false });
-        renderPlaylists();
-        startup.classList.add('hidden');
-        audioPlayer.style.display = 'block';
-        nowPlaying.style.display = 'block';
-        newFileInput.value = '';
-        newFileInput.removeEventListener('change', onNewFiles);
-        saveMeta();
-        // Auto-expand the new card
-        autoExpandLastCard();
-      };
-      newFileInput.addEventListener('change', onNewFiles);
-    });
+      playlists.push({ name, files: unique, loop: false, shuffle: false });
+renderPlaylists();
+startup.classList.add('hidden');
+audioPlayer.style.display = 'block';
+nowPlaying.style.display = 'block';
+newFileInput.value = '';
+saveMeta();
+});
 
-    cancelPopupBtn.addEventListener('click', () => {
-      popup.classList.add('hidden');
-    });
+    // Render all playlists
+function renderPlaylists() {
+cardsContainer.innerHTML = '';
+playlists.forEach((p, index) => {
+const card = document.createElement('div');
+card.className = 'playlist-card';
 
-    function autoExpandLastCard() {
-      const cards = cardsContainer.querySelectorAll('.playlist-card');
-      const card = cards[cards.length - 1];
-      if (!card) return;
-      const list = card.querySelector('.file-list');
-      const toggle = card.querySelector('.toggle-btn');
-      if (list) list.style.display = 'block';
-      if (toggle) toggle.textContent = 'Hide';
-    }
+        // Header with dropdown toggle (only name visible until expanded)
+const header = document.createElement('div');
+header.className = 'card-header';
 
-    /* Rendering */
-    function renderPlaylists() {
-      cardsContainer.innerHTML = '';
-      playlists.forEach((p, index) => {
-        const card = document.createElement('div');
-        card.className = 'playlist-card';
+const title = document.createElement('div');
+title.className = 'card-title';
+title.textContent = p.name;
 
-        /* Header: title + rename + show/hide */
-        const header = document.createElement('div');
-        header.className = 'card-header';
+const toggle = document.createElement('button');
+toggle.className = 'pill-btn btn-secondary';
+toggle.textContent = 'Show';
+toggle.onclick = () => {
+list.style.display = list.style.display === 'none' ? 'block' : 'none';
+toggle.textContent = list.style.display === 'none' ? 'Show' : 'Hide';
+};
 
-        const titleWrap = document.createElement('div');
-        titleWrap.className = 'card-title-wrap';
+header.appendChild(title);
+header.appendChild(toggle);
 
-        const title = document.createElement('div');
-        title.className = 'card-title';
-        title.textContent = p.name;
+        // File list (hidden by default)
+const list = document.createElement('div');
+list.className = 'file-list';
+updateFileList(list, p.files);
 
-        const renameBtn = document.createElement('button');
-        renameBtn.className = 'rename-btn';
-        renameBtn.textContent = '📝';
-        renameBtn.title = 'Rename';
-        renameBtn.onclick = () => {
-          const newName = prompt('Rename playlist:', p.name);
-          if (!newName) return;
-          p.name = newName.trim();
-          renderPlaylists();
-          saveMeta();
+        // Controls
+const controls = document.createElement('div');
+controls.className = 'card-controls';
+
+        const playBtn = document.createElement('button');
+        playBtn.className = 'pill-btn btn-primary';
+        playBtn.textContent = 'Play';
+        playBtn.onclick = () => playPlaylist(index);
+
+        const backBtn = document.createElement('button');
+        backBtn.className = 'pill-btn btn-secondary';
+        backBtn.textContent = 'Back';
+        backBtn.onclick = () => {
+        const playBtn = makeBtn('▶️', () => playPlaylist(index));
+        const backBtn = makeBtn('⏮️', () => {
+if (currentPlaylistIndex === index && currentTrackIndex > 0) {
+currentTrackIndex--;
+playTrack();
+}
         };
 
-        titleWrap.appendChild(title);
-        titleWrap.appendChild(renameBtn);
-
-        const toggle = document.createElement('button');
-        toggle.className = 'pill-btn btn-secondary toggle-btn';
-        toggle.textContent = 'Show';
-        toggle.onclick = () => {
-          list.style.display = list.style.display === 'none' ? 'block' : 'none';
-          toggle.textContent = list.style.display === 'none' ? 'Show' : 'Hide';
+        const skipBtn = document.createElement('button');
+        skipBtn.className = 'pill-btn btn-secondary';
+        skipBtn.textContent = 'Skip';
+        skipBtn.onclick = () => {
+        });
+        const skipBtn = makeBtn('⏭️', () => {
+if (currentPlaylistIndex === index && currentTrackIndex < p.files.length - 1) {
+currentTrackIndex++;
+playTrack();
+}
         };
 
-        header.appendChild(titleWrap);
-        header.appendChild(toggle);
-
-        /* File list (draggable items) */
-        const list = document.createElement('div');
-        list.className = 'file-list';
-        updateFileList(list, p.files, index);
-
-        /* Controls toolbar (icons) */
-        const controls = document.createElement('div');
-        controls.className = 'card-controls';
-
-        const playBtn = makeIconBtn('▶️', true, () => playPlaylist(index));
-        const backBtn = makeIconBtn('⏮️', false, () => {
-          if (currentPlaylistIndex === index && currentTrackIndex > 0) {
-            currentTrackIndex--; playTrack();
-          }
+        const loopBtn = document.createElement('button');
+        loopBtn.className = 'pill-btn btn-secondary';
+        loopBtn.textContent = p.loop ? 'Loop On' : 'Loop Off';
+        loopBtn.onclick = () => {
         });
-        const skipBtn = makeIconBtn('⏭️', false, () => {
-          if (currentPlaylistIndex === index && currentTrackIndex < p.files.length - 1) {
-            currentTrackIndex++; playTrack();
-          }
-        });
-        const loopBtn = makeIconBtn(p.loop ? '🔁 On' : '🔁 Off', false, () => {
-          p.loop = !p.loop;
+        const loopBtn = makeBtn(p.loop ? '🔁 On' : '🔁 Off', () => {
+p.loop = !p.loop;
+          loopBtn.textContent = p.loop ? 'Loop On' : 'Loop Off';
           loopBtn.textContent = p.loop ? '🔁 On' : '🔁 Off';
-          saveMeta();
+saveMeta();
+        };
+
+        const addBtn = document.createElement('button');
+        addBtn.className = 'pill-btn btn-secondary';
+        addBtn.textContent = 'Add Files';
+        addBtn.onclick = () => {
         });
-        const shuffleBtn = makeIconBtn(p.shuffle ? '🔀 On' : '🔀 Off', false, () => {
+        const shuffleBtn = makeBtn(p.shuffle ? '🔀 On' : '🔀 Off', () => {
           p.shuffle = !p.shuffle;
           shuffleBtn.textContent = p.shuffle ? '🔀 On' : '🔀 Off';
           saveMeta();
         });
-        const addBtn = makeIconBtn('➕', false, () => {
-          currentPlaylistIndex = index;
-          addFileInput.click();
-        });
-        const delBtn = makeIconBtn('🗑️', false, () => {
-          playlists.splice(index, 1);
-          renderPlaylists();
-          if (playlists.length === 0) {
-            startup.classList.remove('hidden');
-            audioPlayer.style.display = 'none';
-            nowPlaying.style.display = 'none';
-            nowPlaying.textContent = '';
-            audioPlayer.pause(); audioPlayer.src = '';
+        const renameBtn = makeBtn('📝', () => {
+          const newName = prompt('Rename playlist:', p.name);
+          if (newName) {
+            p.name = newName.trim();
+            renderPlaylists();
+            saveMeta();
           }
-          saveMeta();
         });
-        const hideBtn = makeIconBtn('🙈', false, () => {
-          list.style.display = 'none';
-          toggle.textContent = 'Show';
+        const addBtn = makeBtn('➕', () => {
+currentPlaylistIndex = index;
+addFileInput.click();
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'pill-btn btn-secondary';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = () => {
+        });
+        const delBtn = makeBtn('🗑️', () => {
+playlists.splice(index, 1);
+renderPlaylists();
+if (playlists.length === 0) {
+startup.classList.remove('hidden');
+audioPlayer.style.display = 'none';
+nowPlaying.style.display = 'none';
+nowPlaying.textContent = '';
+audioPlayer.pause();
+audioPlayer.src = '';
+}
+saveMeta();
+        };
         });
 
-        controls.append(playBtn, backBtn, skipBtn, loopBtn, shuffleBtn, addBtn, delBtn, hideBtn);
+        controls.append(playBtn, backBtn, skipBtn, loopBtn, addBtn, delBtn);
+        controls.append(playBtn, backBtn, skipBtn, loopBtn, shuffleBtn, renameBtn, addBtn, delBtn);
+card.append(header, list, controls);
+cardsContainer.appendChild(card);
+});
+}
 
-        /* Assemble card */
-        card.append(header, list, controls);
-        cardsContainer.appendChild(card);
-      });
-    }
-
-    function makeIconBtn(label, primary, action) {
+    // Update file list section
+    function makeBtn(label, action) {
       const btn = document.createElement('button');
-      btn.className = 'icon-btn' + (primary ? ' primary' : '');
+      btn.className = 'pill-btn btn-secondary';
       btn.textContent = label;
       btn.onclick = action;
       return btn;
     }
 
-    /* Build file list with drag-and-drop reordering */
-    function updateFileList(container, files, playlistIndex) {
-      container.innerHTML = '';
-      files.forEach((f, i) => {
-        const item = document.createElement('div');
-        item.className = 'file-item';
-        item.textContent = `${i + 1}. ${f.name}`;
-        item.draggable = true;
-        item.dataset.index = i;
-
-        const handle = document.createElement('span');
-        handle.className = 'drag-handle';
-        handle.textContent = '⋮⋮';
-
-        /* Play by clicking the row */
-        item.addEventListener('click', () => {
-          currentPlaylistIndex = playlistIndex;
+function updateFileList(container, files) {
+container.innerHTML = '';
+files.forEach((f, i) => {
+const item = document.createElement('div');
+item.className = 'file-item';
+item.textContent = `${i + 1}. ${f.name}`;
+        item.onclick = () => {
           currentTrackIndex = i;
           playTrack();
-        });
+        };
+container.appendChild(item);
+});
+}
 
-        /* Drag events */
-        item.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', i);
-        });
-        item.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          item.style.background = '#000';
-          item.style.color = '#fff';
-        });
-        item.addEventListener('dragleave', () => {
-          item.style.background = '';
-          item.style.color = '';
-        });
-        item.addEventListener('drop', (e) => {
-          e.preventDefault();
-          const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
-          const to = parseInt(item.dataset.index, 10);
-          const list = playlists[playlistIndex].files;
-          const moved = list.splice(from, 1)[0];
-          list.splice(to, 0, moved);
-          renderPlaylists(); // re-render to reflect new order
-          // Optional: re-open list after render
-          const card = cardsContainer.children[playlistIndex];
-          const fl = card?.querySelector('.file-list');
-          const tg = card?.querySelector('.toggle-btn');
-          if (fl && tg) { fl.style.display = 'block'; tg.textContent = 'Hide'; }
-        });
+    // Add files to existing playlist (deduped)
+addFileInput.addEventListener('change', () => {
+if (currentPlaylistIndex === null) return;
+const selection = Array.from(addFileInput.files);
+if (selection.length === 0) return;
 
-        item.appendChild(handle);
-        container.appendChild(item);
-      });
-    }
-    /* Add files to existing playlist (deduped) */
-    addFileInput.addEventListener('change', () => {
-      if (currentPlaylistIndex === null) return;
-      const selection = Array.from(addFileInput.files);
-      if (selection.length === 0) return;
+const p = playlists[currentPlaylistIndex];
+const unique = addUniqueFiles(p.files, selection);
+p.files.push(...unique);
 
-      const p = playlists[currentPlaylistIndex];
-      const unique = addUniqueFiles(p.files, selection);
-      p.files.push(...unique);
+      // Re-render and auto-expand updated playlist
+renderPlaylists();
+const card = cardsContainer.children[currentPlaylistIndex];
+if (card) {
+const toggle = card.querySelector('.pill-btn.btn-secondary');
+const list = card.querySelector('.file-list');
+if (list && toggle) {
+list.style.display = 'block';
+toggle.textContent = 'Hide';
+}
+}
+addFileInput.value = '';
+saveMeta();
+});
 
-      renderPlaylists();
-
-      // Auto-expand updated playlist
-      const card = cardsContainer.children[currentPlaylistIndex];
-      const fl = card?.querySelector('.file-list');
-      const tg = card?.querySelector('.toggle-btn');
-      if (fl && tg) { fl.style.display = 'block'; tg.textContent = 'Hide'; }
-
-      addFileInput.value = '';
-      saveMeta();
-    });
-
-    /* Playback with shuffle + loop */
-    function playPlaylist(index) {
-      currentPlaylistIndex = index;
-      currentTrackIndex = 0;
-      const p = playlists[index];
-      shuffledOrder = p.shuffle
-        ? [...Array(p.files.length).keys()].sort(() => Math.random() - 0.5)
+    // Playback
+function playPlaylist(index) {
+currentPlaylistIndex = index;
+currentTrackIndex = 0;
+      shuffledOrder = playlists[index].shuffle
+        ? [...Array(playlists[index].files.length).keys()].sort(() => Math.random() - 0.5)
         : [];
-      playTrack();
-    }
+playTrack();
+}
 
-    function playTrack() {
-      const p = playlists[currentPlaylistIndex];
-      if (!p) return;
+function playTrack() {
+const p = playlists[currentPlaylistIndex];
+if (!p) return;
 
-      const order = p.shuffle
-        ? shuffledOrder
-        : [...Array(p.files.length).keys()];
-
-      if (order.length === 0) {
-        nowPlaying.textContent = '';
-        audioPlayer.pause();
-        audioPlayer.src = '';
-        return;
-      }
-
+      // Handle end-of-list with optional loop
+      if (currentTrackIndex >= p.files.length) {
+      const order = p.shuffle ? shuffledOrder : [...Array(p.files.length).keys()];
       if (currentTrackIndex >= order.length) {
-        if (p.loop) {
-          currentTrackIndex = 0;
-        } else {
-          nowPlaying.textContent = '';
-          audioPlayer.pause();
-          return;
-        }
-      }
+if (p.loop && p.files.length > 0) {
+currentTrackIndex = 0;
+} else {
+nowPlaying.textContent = '';
+audioPlayer.pause();
+return;
+}
+}
 
+      const file = p.files[currentTrackIndex];
       const fileIndex = order[currentTrackIndex];
       const file = p.files[fileIndex];
-      const url = URL.createObjectURL(file);
-      audioPlayer.src = url;
-      audioPlayer.play();
-      nowPlaying.textContent = `Now Playing: ${file.name}`;
+const url = URL.createObjectURL(file);
+audioPlayer.src = url;
+audioPlayer.play();
+nowPlaying.textContent = `Now Playing: ${file.name}`;
 
-      audioPlayer.onended = () => {
-        currentTrackIndex++;
-        playTrack();
-      };
-    }
+audioPlayer.onended = () => {
+currentTrackIndex++;
+playTrack();
+};
+}
 
-    /* Load metadata (names, loop/shuffle) on start */
-    window.addEventListener('DOMContentLoaded', () => {
-      const meta = loadMeta();
-      if (meta.length > 0) {
+    // Load metadata on start
+window.addEventListener('DOMContentLoaded', () => {
+const meta = loadMeta();
+if (meta.length > 0) {
+        // Rebuild playlists with empty file arrays (files can't persist in localStorage)
+        playlists = meta.map((m, i) => ({ name: m.name || `Playlist ${i + 1}`, files: [], loop: !!m.loop }));
         playlists = meta.map((m, i) => ({
           name: m.name || `Playlist ${i + 1}`,
           files: [],
           loop: !!m.loop,
           shuffle: !!m.shuffle
         }));
-        renderPlaylists();
-        // Keep startup visible until a playlist gets files
-        startup.classList.remove('hidden');
-        audioPlayer.style.display = 'none';
-        nowPlaying.style.display = 'none';
-      } else {
-        startup.classList.remove('hidden');
-        audioPlayer.style.display = 'none';
-        nowPlaying.style.display = 'none';
-      }
-    });
-
-    /* Close popup when clicking backdrop */
-    popup.addEventListener('click', (e) => {
-      if (e.target === popup) {
-        popup.classList.add('hidden');
-      }
-    });
-  </script>
+renderPlaylists();
+        // Keep startup visible until user adds files to any playlist
+startup.classList.remove('hidden');
+audioPlayer.style.display = 'none';
+nowPlaying.style.display = 'none';
+} else {
+startup.classList.remove('hidden');
+audioPlayer.style.display = 'none';
+nowPlaying.style.display = 'none';
+}
+});
+</script>
 </body>
 </html>
