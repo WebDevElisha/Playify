@@ -6,21 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #0f0f10;    /* black */
-      --card: #ffffff;  /* white */
-      --red: #d60000;   /* red accent */
+      --bg: #0f0f10;
+      --card: #ffffff;
+      --red: #d60000;
       --red-d: #a00000;
       --text: #111111;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-family: system-ui, sans-serif;
       background: var(--bg);
       color: #fff;
     }
 
-    /* Header with music note icon */
     header {
       height: 64px;
       background: var(--red);
@@ -34,7 +33,6 @@
     }
     .music-icon { width: 28px; height: 28px; }
 
-    /* Startup screen */
     .startup {
       display: grid;
       place-items: center;
@@ -45,7 +43,6 @@
     .title-big { font-size: 42px; font-weight: 900; }
     .subtitle { color: #cfcfcf; margin: 8px 0 18px; }
 
-    /* Buttons */
     .pill-btn {
       padding: 10px 20px;
       border-radius: 999px;
@@ -58,7 +55,6 @@
     .btn-secondary { background: #fff; color: var(--red); border: 2px solid var(--red); }
     .btn-secondary:hover { background: #f6f6f6; }
 
-    /* Canvas and cards (small boxes) */
     main.canvas { padding: 20px; max-width: 1000px; margin: 0 auto; }
     .cards {
       display: grid;
@@ -74,7 +70,6 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.25);
     }
 
-    /* Header + dropdown */
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -82,18 +77,30 @@
       margin-bottom: 6px;
     }
     .card-title { font-weight: 900; color: var(--red); }
-    .file-list { display: none; margin-top: 8px; }
-    .file-item { font-size: 14px; margin: 3px 0; }
+    .file-list {
+      display: none;
+      margin-top: 8px;
+    }
+    .file-item {
+      font-size: 14px;
+      margin: 3px 0;
+      padding: 4px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .file-item:hover {
+      background: #000;
+      color: #fff;
+    }
 
-    /* Controls row */
     .card-controls {
       margin-top: 10px;
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
+      justify-content: center;
     }
 
-    /* Audio + Now playing */
     .player-wrap {
       max-width: 900px;
       margin: 10px auto 30px;
@@ -102,19 +109,17 @@
     .now-playing { display: none; margin: 10px 0; }
     audio { display: none; width: 95%; max-width: 900px; }
 
-    /* Utility */
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <header>
-    <svg class="music-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg class="music-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
       <path d="M48 6v36.2c-2.4-1.4-5.2-2.2-8-2.2-7.2 0-13 5.8-13 13s5.8 13 13 13 13-5.8 13-13V18h10V6H48z" fill="#fff"/>
     </svg>
     Playify
   </header>
 
-  <!-- Startup screen -->
   <section class="startup" id="startup">
     <div>
       <div class="title-big">Playify</div>
@@ -123,22 +128,18 @@
     </div>
   </section>
 
-  <!-- Main canvas -->
   <main class="canvas">
     <div class="cards" id="cards"></div>
   </main>
 
-  <!-- Global controls (hidden inputs triggered by buttons) -->
   <input type="file" id="newFileInput" multiple accept="audio/*" />
   <input type="file" id="addFileInput" multiple accept="audio/*" />
 
-  <!-- Player -->
   <div class="player-wrap">
     <p class="now-playing" id="nowPlaying"></p>
     <audio id="audioPlayer" controls></audio>
   </div>
   <script>
-    // State
     const startup = document.getElementById('startup');
     const cardsContainer = document.getElementById('cards');
     const newFileInput = document.getElementById('newFileInput');
@@ -146,17 +147,22 @@
     const audioPlayer = document.getElementById('audioPlayer');
     const nowPlaying = document.getElementById('nowPlaying');
 
-    let playlists = []; // { name, files: File[], loop: boolean }
+    let playlists = [];
     let currentPlaylistIndex = null;
     let currentTrackIndex = 0;
+    let shuffledOrder = [];
 
-    // LocalStorage (metadata only: name + loop)
     const LS_KEY = 'playify_meta';
 
     function saveMeta() {
-      const meta = playlists.map(p => ({ name: p.name, loop: p.loop }));
+      const meta = playlists.map(p => ({
+        name: p.name,
+        loop: p.loop,
+        shuffle: p.shuffle
+      }));
       localStorage.setItem(LS_KEY, JSON.stringify(meta));
     }
+
     function loadMeta() {
       try {
         const raw = localStorage.getItem(LS_KEY);
@@ -166,29 +172,22 @@
       }
     }
 
-    // Helper: add files uniquely (prevents duplicates by name+size+lastModified)
-    function addUniqueFiles(targetFiles, newFiles) {
-      const seen = new Set(targetFiles.map(f => `${f.name}|${f.size}|${f.lastModified}`));
-      const unique = [];
-      for (const f of newFiles) {
+    function addUniqueFiles(existing, incoming) {
+      const seen = new Set(existing.map(f => `${f.name}|${f.size}|${f.lastModified}`));
+      return incoming.filter(f => {
         const key = `${f.name}|${f.size}|${f.lastModified}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          unique.push(f);
-        }
-      }
-      return unique;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
     }
 
-    // Create new playlist
     newFileInput.addEventListener('change', () => {
       const selection = Array.from(newFileInput.files);
       if (selection.length === 0) return;
-
       const unique = addUniqueFiles([], selection);
       const name = `Playlist ${playlists.length + 1}`;
-      playlists.push({ name, files: unique, loop: false });
-
+      playlists.push({ name, files: unique, loop: false, shuffle: false });
       renderPlaylists();
       startup.classList.add('hidden');
       audioPlayer.style.display = 'block';
@@ -197,14 +196,12 @@
       saveMeta();
     });
 
-    // Render all playlists
     function renderPlaylists() {
       cardsContainer.innerHTML = '';
       playlists.forEach((p, index) => {
         const card = document.createElement('div');
         card.className = 'playlist-card';
 
-        // Header with dropdown toggle (only name visible until expanded)
         const header = document.createElement('div');
         header.className = 'card-header';
 
@@ -223,61 +220,49 @@
         header.appendChild(title);
         header.appendChild(toggle);
 
-        // File list (hidden by default)
         const list = document.createElement('div');
         list.className = 'file-list';
         updateFileList(list, p.files);
 
-        // Controls
         const controls = document.createElement('div');
         controls.className = 'card-controls';
 
-        const playBtn = document.createElement('button');
-        playBtn.className = 'pill-btn btn-primary';
-        playBtn.textContent = 'Play';
-        playBtn.onclick = () => playPlaylist(index);
-
-        const backBtn = document.createElement('button');
-        backBtn.className = 'pill-btn btn-secondary';
-        backBtn.textContent = 'Back';
-        backBtn.onclick = () => {
+        const playBtn = makeBtn('▶️', () => playPlaylist(index));
+        const backBtn = makeBtn('⏮️', () => {
           if (currentPlaylistIndex === index && currentTrackIndex > 0) {
             currentTrackIndex--;
             playTrack();
           }
-        };
-
-        const skipBtn = document.createElement('button');
-        skipBtn.className = 'pill-btn btn-secondary';
-        skipBtn.textContent = 'Skip';
-        skipBtn.onclick = () => {
+        });
+        const skipBtn = makeBtn('⏭️', () => {
           if (currentPlaylistIndex === index && currentTrackIndex < p.files.length - 1) {
             currentTrackIndex++;
             playTrack();
           }
-        };
-
-        const loopBtn = document.createElement('button');
-        loopBtn.className = 'pill-btn btn-secondary';
-        loopBtn.textContent = p.loop ? 'Loop On' : 'Loop Off';
-        loopBtn.onclick = () => {
+        });
+        const loopBtn = makeBtn(p.loop ? '🔁 On' : '🔁 Off', () => {
           p.loop = !p.loop;
-          loopBtn.textContent = p.loop ? 'Loop On' : 'Loop Off';
+          loopBtn.textContent = p.loop ? '🔁 On' : '🔁 Off';
           saveMeta();
-        };
-
-        const addBtn = document.createElement('button');
-        addBtn.className = 'pill-btn btn-secondary';
-        addBtn.textContent = 'Add Files';
-        addBtn.onclick = () => {
+        });
+        const shuffleBtn = makeBtn(p.shuffle ? '🔀 On' : '🔀 Off', () => {
+          p.shuffle = !p.shuffle;
+          shuffleBtn.textContent = p.shuffle ? '🔀 On' : '🔀 Off';
+          saveMeta();
+        });
+        const renameBtn = makeBtn('📝', () => {
+          const newName = prompt('Rename playlist:', p.name);
+          if (newName) {
+            p.name = newName.trim();
+            renderPlaylists();
+            saveMeta();
+          }
+        });
+        const addBtn = makeBtn('➕', () => {
           currentPlaylistIndex = index;
           addFileInput.click();
-        };
-
-        const delBtn = document.createElement('button');
-        delBtn.className = 'pill-btn btn-secondary';
-        delBtn.textContent = 'Delete';
-        delBtn.onclick = () => {
+        });
+        const delBtn = makeBtn('🗑️', () => {
           playlists.splice(index, 1);
           renderPlaylists();
           if (playlists.length === 0) {
@@ -289,36 +274,43 @@
             audioPlayer.src = '';
           }
           saveMeta();
-        };
+        });
 
-        controls.append(playBtn, backBtn, skipBtn, loopBtn, addBtn, delBtn);
+        controls.append(playBtn, backBtn, skipBtn, loopBtn, shuffleBtn, renameBtn, addBtn, delBtn);
         card.append(header, list, controls);
         cardsContainer.appendChild(card);
       });
     }
 
-    // Update file list section
+    function makeBtn(label, action) {
+      const btn = document.createElement('button');
+      btn.className = 'pill-btn btn-secondary';
+      btn.textContent = label;
+      btn.onclick = action;
+      return btn;
+    }
+
     function updateFileList(container, files) {
       container.innerHTML = '';
       files.forEach((f, i) => {
         const item = document.createElement('div');
         item.className = 'file-item';
         item.textContent = `${i + 1}. ${f.name}`;
+        item.onclick = () => {
+          currentTrackIndex = i;
+          playTrack();
+        };
         container.appendChild(item);
       });
     }
 
-    // Add files to existing playlist (deduped)
     addFileInput.addEventListener('change', () => {
       if (currentPlaylistIndex === null) return;
       const selection = Array.from(addFileInput.files);
       if (selection.length === 0) return;
-
       const p = playlists[currentPlaylistIndex];
       const unique = addUniqueFiles(p.files, selection);
       p.files.push(...unique);
-
-      // Re-render and auto-expand updated playlist
       renderPlaylists();
       const card = cardsContainer.children[currentPlaylistIndex];
       if (card) {
@@ -333,10 +325,12 @@
       saveMeta();
     });
 
-    // Playback
     function playPlaylist(index) {
       currentPlaylistIndex = index;
       currentTrackIndex = 0;
+      shuffledOrder = playlists[index].shuffle
+        ? [...Array(playlists[index].files.length).keys()].sort(() => Math.random() - 0.5)
+        : [];
       playTrack();
     }
 
@@ -344,8 +338,8 @@
       const p = playlists[currentPlaylistIndex];
       if (!p) return;
 
-      // Handle end-of-list with optional loop
-      if (currentTrackIndex >= p.files.length) {
+      const order = p.shuffle ? shuffledOrder : [...Array(p.files.length).keys()];
+      if (currentTrackIndex >= order.length) {
         if (p.loop && p.files.length > 0) {
           currentTrackIndex = 0;
         } else {
@@ -355,7 +349,8 @@
         }
       }
 
-      const file = p.files[currentTrackIndex];
+      const fileIndex = order[currentTrackIndex];
+      const file = p.files[fileIndex];
       const url = URL.createObjectURL(file);
       audioPlayer.src = url;
       audioPlayer.play();
@@ -367,14 +362,16 @@
       };
     }
 
-    // Load metadata on start
     window.addEventListener('DOMContentLoaded', () => {
       const meta = loadMeta();
       if (meta.length > 0) {
-        // Rebuild playlists with empty file arrays (files can't persist in localStorage)
-        playlists = meta.map((m, i) => ({ name: m.name || `Playlist ${i + 1}`, files: [], loop: !!m.loop }));
+        playlists = meta.map((m, i) => ({
+          name: m.name || `Playlist ${i + 1}`,
+          files: [],
+          loop: !!m.loop,
+          shuffle: !!m.shuffle
+        }));
         renderPlaylists();
-        // Keep startup visible until user adds files to any playlist
         startup.classList.remove('hidden');
         audioPlayer.style.display = 'none';
         nowPlaying.style.display = 'none';
