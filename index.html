@@ -11,6 +11,7 @@
       --red: #d60000;
       --red-d: #a00000;
       --text: #111111;
+      --muted: #666;
     }
     * { box-sizing: border-box; }
     body {
@@ -20,6 +21,7 @@
       color: #fff;
     }
 
+    /* Header */
     header {
       height: 64px;
       background: var(--red);
@@ -33,15 +35,25 @@
     }
     .music-icon { width: 28px; height: 28px; }
 
+    /* Startup */
     .startup {
       display: grid;
       place-items: center;
-      height: calc(100vh - 64px);
+      min-height: calc(100vh - 64px);
       text-align: center;
-      padding: 16px;
+      padding: 20px;
     }
     .title-big { font-size: 42px; font-weight: 900; }
     .subtitle { color: #cfcfcf; margin: 8px 0 18px; }
+
+    /* Choice buttons */
+    .choice-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
     .pill-btn {
       padding: 10px 20px;
       border-radius: 999px;
@@ -54,38 +66,53 @@
     .btn-secondary { background: #fff; color: var(--red); border: 2px solid var(--red); }
     .btn-secondary:hover { background: #f6f6f6; }
 
-    main.canvas { padding: 20px; max-width: 1100px; margin: 0 auto; }
+    /* Canvas and cards */
+    main.canvas { padding: 24px; max-width: 1200px; margin: 0 auto; }
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 18px;
     }
+
+    /* Playlist card — grows when single playlist exists */
     .playlist-card {
       background: var(--card);
       color: var(--text);
       border: 2px solid var(--red);
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+      position: relative;
+      user-select: none;
+    }
+    .playlist-card.single-expand {
+      min-height: calc(100vh - 64px - 80px);
+      width: 100%;
     }
 
+    /* Draggable card */
+    .playlist-card[draggable="true"] { cursor: grab; }
+    .playlist-card.dragging { opacity: 0.85; cursor: grabbing; }
+
+    /* Card header */
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
     }
-    .card-title { font-weight: 900; color: var(--red); }
+    .card-title { font-weight: 900; color: var(--red); font-size: 20px; }
+    .toggle-btn { margin-left: 8px; }
 
+    /* File list */
     .file-list {
       display: none;
-      margin-top: 8px;
+      margin-top: 10px;
     }
     .file-item {
       font-size: 14px;
-      margin: 3px 0;
-      padding: 6px 8px;
-      border-radius: 6px;
+      margin: 4px 0;
+      padding: 8px 10px;
+      border-radius: 8px;
       cursor: move;
       display: flex;
       align-items: center;
@@ -97,24 +124,34 @@
       color: #fff;
     }
     .row-left { display: inline-flex; align-items: center; gap: 8px; }
-    .drag-handle { color: #666; font-size: 14px; cursor: move; user-select: none; }
+    .drag-handle { color: var(--muted); font-size: 14px; cursor: move; user-select: none; }
 
+    /* Toolbar controls — cleaner circular icon buttons */
     .card-controls {
-      margin-top: 10px;
-      display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap: 6px;
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .group {
+      display: inline-flex;
+      gap: 8px;
       align-items: center;
     }
     .icon-btn {
-      padding: 8px 10px;
-      border-radius: 8px;
+      width: 38px; height: 38px;
+      border-radius: 50%;
       border: 2px solid var(--red);
       background: #fff;
       color: var(--red);
+      font-size: 18px;
       font-weight: 800;
       cursor: pointer;
-      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .icon-btn.primary {
       background: var(--red);
@@ -123,6 +160,7 @@
     }
     .icon-btn:hover { filter: brightness(0.95); }
 
+    /* Player */
     .player-wrap {
       max-width: 1000px;
       margin: 10px auto 30px;
@@ -133,6 +171,7 @@
 
     .hidden { display: none !important; }
 
+    /* Popup for naming new playlist / adding YouTube link */
     .popup {
       position: fixed;
       inset: 0;
@@ -147,10 +186,11 @@
       padding: 20px;
       border-radius: 12px;
       text-align: center;
-      width: 320px;
+      width: 340px;
     }
+    .popup-content h3 { margin: 0; }
     .popup-content input {
-      width: 92%;
+      width: 94%;
       padding: 10px;
       margin-top: 10px;
       border: 1px solid #ccc;
@@ -162,6 +202,17 @@
       gap: 10px;
       justify-content: center;
     }
+
+    /* Minimal YouTube container (audio-only intent) */
+    .yt-audio {
+      width: 0;
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+    }
   </style>
 </head>
 <body>
@@ -172,11 +223,15 @@
     Playify
   </header>
 
+  <!-- Startup with choice: YouTube link or local files -->
   <section class="startup" id="startup">
     <div>
       <div class="title-big">Playify</div>
-      <p class="subtitle">Name your playlist and add files to start.</p>
-      <button class="pill-btn btn-primary" id="createPlaylistBtn">Create playlist</button>
+      <p class="subtitle">Choose how you want to start your playlist.</p>
+      <div class="choice-row">
+        <button class="pill-btn btn-secondary" id="createYouTubeBtn">Use YouTube link</button>
+        <button class="pill-btn btn-primary" id="createPlaylistBtn">Create playlist (files)</button>
+      </div>
     </div>
   </section>
 
@@ -193,14 +248,14 @@
     <audio id="audioPlayer" controls></audio>
   </div>
 
-  <!-- Name popup -->
+  <!-- Popup (reused) -->
   <div class="popup hidden" id="popup">
     <div class="popup-content">
-      <h3>Name your playlist</h3>
-      <input type="text" id="playlistInput" placeholder="My Playlist" />
+      <h3 id="popupTitle">Name your playlist</h3>
+      <input type="text" id="popupInput" placeholder="My Playlist" />
       <div class="popup-actions">
-        <button class="pill-btn btn-primary" id="savePlaylistBtn">Save</button>
-        <button class="pill-btn btn-secondary" id="cancelPopupBtn">Cancel</button>
+        <button class="pill-btn btn-primary" id="popupConfirmBtn">Save</button>
+        <button class="pill-btn btn-secondary" id="popupCancelBtn">Cancel</button>
       </div>
     </div>
   </div>
@@ -208,28 +263,32 @@
     /* Elements */
     const startup = document.getElementById('startup');
     const createPlaylistBtn = document.getElementById('createPlaylistBtn');
+    const createYouTubeBtn = document.getElementById('createYouTubeBtn');
     const cardsContainer = document.getElementById('cards');
     const newFileInput = document.getElementById('newFileInput');
     const addFileInput = document.getElementById('addFileInput');
     const audioPlayer = document.getElementById('audioPlayer');
     const nowPlaying = document.getElementById('nowPlaying');
     const popup = document.getElementById('popup');
-    const playlistInput = document.getElementById('playlistInput');
-    const savePlaylistBtn = document.getElementById('savePlaylistBtn');
-    const cancelPopupBtn = document.getElementById('cancelPopupBtn');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupInput = document.getElementById('popupInput');
+    const popupConfirmBtn = document.getElementById('popupConfirmBtn');
+    const popupCancelBtn = document.getElementById('popupCancelBtn');
 
     /* State */
-    let playlists = []; // { name, files: File[], loop, shuffle }
+    let playlists = []; // { name, type: 'files'|'youtube', files: File[], ytUrl?: string, loop, shuffle }
     let currentPlaylistIndex = null;
     let currentTrackIndex = 0;
-    let shuffledOrder = [];
-    let pendingFiles = [];
 
     /* LocalStorage (metadata only) */
     const LS_KEY = 'playify_meta';
     function saveMeta() {
       const meta = playlists.map(p => ({
-        name: p.name, loop: p.loop, shuffle: p.shuffle
+        name: p.name,
+        type: p.type,
+        loop: p.loop,
+        shuffle: p.shuffle,
+        ytUrl: p.ytUrl || null
       }));
       localStorage.setItem(LS_KEY, JSON.stringify(meta));
     }
@@ -251,47 +310,123 @@
       return out;
     }
 
-    /* Create playlist flow */
+    /* Create playlist (files) — no phantom/duplicate card */
     createPlaylistBtn.addEventListener('click', () => {
       popup.classList.remove('hidden');
-      playlistInput.value = '';
-      pendingFiles = [];
-    });
-
-    savePlaylistBtn.addEventListener('click', () => {
-      const name = playlistInput.value.trim() || `Playlist ${playlists.length + 1}`;
-      popup.classList.add('hidden');
-
-      // Prompt for files next
-      newFileInput.click();
-      const onNewFiles = () => {
-        const selection = Array.from(newFileInput.files);
-        const unique = addUniqueFiles([], selection);
-        playlists.push({ name, files: unique, loop: false, shuffle: false });
-        renderPlaylists();
-        startup.classList.add('hidden');
-        audioPlayer.style.display = 'block';
-        nowPlaying.style.display = 'block';
-        newFileInput.value = '';
-        newFileInput.removeEventListener('change', onNewFiles);
-        saveMeta();
-        autoExpandLastCard();
+      popupTitle.textContent = 'Name your playlist';
+      popupInput.placeholder = 'My Playlist';
+      popupInput.value = '';
+      popupConfirmBtn.onclick = () => {
+        const name = popupInput.value.trim() || `Playlist ${playlists.length + 1}`;
+        popup.classList.add('hidden');
+        // Then prompt for files
+        const onNewFiles = () => {
+          const selection = Array.from(newFileInput.files);
+          const unique = addUniqueFiles([], selection);
+          // Add only if user selected files
+          if (unique.length > 0) {
+            playlists.push({ name, type: 'files', files: unique, loop: false, shuffle: false });
+            renderPlaylists();
+            postCreateReveal();
+            saveMeta();
+          }
+          newFileInput.value = '';
+          newFileInput.removeEventListener('change', onNewFiles);
+        };
+        newFileInput.addEventListener('change', onNewFiles, { once: true });
+        newFileInput.click();
       };
-      newFileInput.addEventListener('change', onNewFiles);
     });
 
-    cancelPopupBtn.addEventListener('click', () => {
-      popup.classList.add('hidden');
+    /* Create YouTube "playlist" (single URL, audio-only intent via embed) */
+    createYouTubeBtn.addEventListener('click', () => {
+      popup.classList.remove('hidden');
+      popupTitle.textContent = 'Enter a YouTube URL';
+      popupInput.placeholder = 'https://www.youtube.com/watch?v=...';
+      popupInput.value = '';
+      popupConfirmBtn.onclick = () => {
+        const url = popupInput.value.trim();
+        if (!url) { popup.classList.add('hidden'); return; }
+        playlists.push({
+          name: 'YouTube',
+          type: 'youtube',
+          ytUrl: url,
+          files: [],
+          loop: false,
+          shuffle: false
+        });
+        popup.classList.add('hidden');
+        renderPlaylists();
+        postCreateReveal();
+        saveMeta();
+      };
     });
 
-    function autoExpandLastCard() {
+    /* Helper: After first playlist, reveal player area */
+    function postCreateReveal() {
+      startup.classList.add('hidden');
+      audioPlayer.style.display = 'block';
+      nowPlaying.style.display = 'block';
+      // Expand card if only one playlist exists
+      resizeCardsForCount();
+    }
+
+    /* Resize/expand cards when there is only one */
+    function resizeCardsForCount() {
+      const count = playlists.length;
       const cards = cardsContainer.querySelectorAll('.playlist-card');
-      const card = cards[cards.length - 1];
-      if (!card) return;
-      const list = card.querySelector('.file-list');
-      const toggle = card.querySelector('.toggle-btn');
-      if (list) list.style.display = 'block';
-      if (toggle) toggle.textContent = 'Hide';
+      cards.forEach(card => {
+        if (count === 1) card.classList.add('single-expand');
+        else card.classList.remove('single-expand');
+      });
+    }
+
+    /* Drag cards between positions */
+    function applyCardDrag() {
+      const cards = cardsContainer.querySelectorAll('.playlist-card');
+      cards.forEach((card, idx) => {
+        card.setAttribute('draggable', 'true');
+        card.addEventListener('dragstart', () => {
+          card.classList.add('dragging');
+          card.dataset.dragIndex = idx;
+        });
+        card.addEventListener('dragend', () => {
+          card.classList.remove('dragging');
+        });
+      });
+
+      cardsContainer.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const dragging = document.querySelector('.playlist-card.dragging');
+        if (!dragging) return;
+        const dragIndex = parseInt(dragging.dataset.dragIndex, 10);
+        const afterElement = getCardAfter(cardsContainer, e.clientY);
+        let dropIndex = playlists.length - 1;
+        if (afterElement) {
+          dropIndex = Array.from(cardsContainer.children).indexOf(afterElement);
+        } else {
+          dropIndex = playlists.length - 1;
+        }
+        if (!isNaN(dragIndex) && dragIndex !== dropIndex) {
+          const moved = playlists.splice(dragIndex, 1)[0];
+          playlists.splice(dropIndex, 0, moved);
+          renderPlaylists();
+          saveMeta();
+        }
+      });
+
+      function getCardAfter(container, y) {
+        const cardElements = [...container.querySelectorAll('.playlist-card:not(.dragging)')];
+        return cardElements.reduce((closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+          if (offset < 0 && offset > (closest.offset || Number.NEGATIVE_INFINITY)) {
+            return { offset, element: child };
+          } else {
+            return closest;
+          }
+        }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+      }
     }
 
     /* Rendering */
@@ -301,13 +436,13 @@
         const card = document.createElement('div');
         card.className = 'playlist-card';
 
-        /* Header: title + rename + show/hide */
+        /* Header: title + show/hide */
         const header = document.createElement('div');
         header.className = 'card-header';
 
         const title = document.createElement('div');
         title.className = 'card-title';
-        title.textContent = p.name;
+        title.textContent = p.type === 'youtube' ? `${p.name} (YouTube)` : p.name;
 
         const toggle = document.createElement('button');
         toggle.className = 'pill-btn btn-secondary toggle-btn';
@@ -320,50 +455,55 @@
         header.appendChild(title);
         header.appendChild(toggle);
 
-        /* File list (draggable + deletable + clickable) */
+        /* File list or YouTube info */
         const list = document.createElement('div');
         list.className = 'file-list';
-        updateFileList(list, p.files, index);
+        if (p.type === 'files') {
+          updateFileList(list, p.files, index);
+        } else {
+          const item = document.createElement('div');
+          item.className = 'file-item';
+          item.innerHTML = `<span class="row-left"><span class="drag-handle">⋮⋮</span><span>YouTube link</span></span><span>${escapeHtml(p.ytUrl || '')}</span>`;
+          item.style.cursor = 'default';
+          item.draggable = false;
+          list.appendChild(item);
+        }
 
-        /* Controls toolbar (icons) */
+        /* Controls toolbar — grouped */
         const controls = document.createElement('div');
         controls.className = 'card-controls';
 
+        const groupPlay = document.createElement('div'); groupPlay.className = 'group';
+        const groupModes = document.createElement('div'); groupModes.className = 'group';
+        const groupActions = document.createElement('div'); groupActions.className = 'group';
+
         const playBtn = makeIconBtn('▶️', true, () => playPlaylist(index));
-        const backBtn = makeIconBtn('⏮️', false, () => {
-          if (currentPlaylistIndex === index && currentTrackIndex > 0) {
-            currentTrackIndex--; playTrack();
-          }
-        });
-        const skipBtn = makeIconBtn('⏭️', false, () => {
-          if (currentPlaylistIndex === index && currentTrackIndex < p.files.length - 1) {
-            currentTrackIndex++; playTrack();
-          }
-        });
-        const loopBtn = makeIconBtn(p.loop ? '🔁 On' : '🔁 Off', false, () => {
-          p.loop = !p.loop;
-          loopBtn.textContent = p.loop ? '🔁 On' : '🔁 Off';
-          saveMeta();
-        });
-        const shuffleBtn = makeIconBtn(p.shuffle ? '🔀 On' : '🔀 Off', false, () => {
-          p.shuffle = !p.shuffle;
-          shuffleBtn.textContent = p.shuffle ? '🔀 On' : '🔀 Off';
-          saveMeta();
-        });
+        const backBtn = makeIconBtn('⏮️', false, () => { if (currentPlaylistIndex === index) { stepPrev(); } });
+        const skipBtn = makeIconBtn('⏭️', false, () => { if (currentPlaylistIndex === index) { stepNext(); } });
+
+        const loopBtn = makeIconBtn('🔁', false, () => { p.loop = !p.loop; loopBtn.style.opacity = p.loop ? '1' : '0.5'; saveMeta(); });
+        loopBtn.style.opacity = p.loop ? '1' : '0.5';
+
+        const shuffleBtn = makeIconBtn('🔀', false, () => { p.shuffle = !p.shuffle; shuffleBtn.style.opacity = p.shuffle ? '1' : '0.5'; saveMeta(); });
+        shuffleBtn.style.opacity = p.shuffle ? '1' : '0.5';
+
         const renameBtn = makeIconBtn('📝', false, () => {
           const newName = prompt('Rename playlist:', p.name);
           if (!newName) return;
           p.name = newName.trim();
-          renderPlaylists();
-          saveMeta();
+          renderPlaylists(); saveMeta();
         });
+
         const addBtn = makeIconBtn('➕', false, () => {
+          if (p.type !== 'files') return;
           currentPlaylistIndex = index;
           addFileInput.click();
         });
+
         const delBtn = makeIconBtn('🗑️', false, () => {
           playlists.splice(index, 1);
           renderPlaylists();
+          resizeCardsForCount();
           if (playlists.length === 0) {
             startup.classList.remove('hidden');
             audioPlayer.style.display = 'none';
@@ -374,12 +514,20 @@
           saveMeta();
         });
 
-        controls.append(playBtn, backBtn, skipBtn, loopBtn, shuffleBtn, renameBtn, addBtn, delBtn);
+        groupPlay.append(playBtn, backBtn, skipBtn);
+        groupModes.append(loopBtn, shuffleBtn);
+        groupActions.append(renameBtn, addBtn, delBtn);
 
-        /* Assemble card */
+        controls.append(groupPlay, groupModes, groupActions);
+
+        /* Assemble card + initial show */
         card.append(header, list, controls);
         cardsContainer.appendChild(card);
+        list.style.display = 'block';
       });
+
+      applyCardDrag();
+      resizeCardsForCount();
     }
 
     function makeIconBtn(label, primary, action) {
@@ -428,7 +576,7 @@
           playTrack();
         });
 
-        /* Drag events */
+        /* Drag events for file reordering */
         item.addEventListener('dragstart', (e) => {
           e.dataTransfer.setData('text/plain', i);
         });
@@ -445,9 +593,9 @@
           e.preventDefault();
           const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
           const to = parseInt(item.dataset.index, 10);
-          const list = playlists[playlistIndex].files;
-          const moved = list.splice(from, 1)[0];
-          list.splice(to, 0, moved);
+          const listRef = playlists[playlistIndex].files;
+          const moved = listRef.splice(from, 1)[0];
+          listRef.splice(to, 0, moved);
           renderPlaylists();
           // Re-open list after render
           const card = cardsContainer.children[playlistIndex];
@@ -459,16 +607,26 @@
         container.appendChild(item);
       });
     }
-    /* Add files to existing playlist (deduped) */
+
+    /* Utils */
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, s => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[s]));
+    }
+  </script>
+  <script>
+    /* Add files to existing playlist (deduped, no duplication bug) */
     addFileInput.addEventListener('change', () => {
       if (currentPlaylistIndex === null) return;
       const selection = Array.from(addFileInput.files);
       if (selection.length === 0) return;
 
       const p = playlists[currentPlaylistIndex];
+      if (p.type !== 'files') return;
+
       const unique = addUniqueFiles(p.files, selection);
       p.files.push(...unique);
-
       renderPlaylists();
 
       // Auto-expand updated playlist
@@ -481,14 +639,34 @@
       saveMeta();
     });
 
-    /* Playback with shuffle + loop */
+    /* Playback controls */
     function playPlaylist(index) {
       currentPlaylistIndex = index;
-      currentTrackIndex = 0;
       const p = playlists[index];
-      shuffledOrder = p.shuffle
-        ? [...Array(p.files.length).keys()].sort(() => Math.random() - 0.5)
-        : [];
+      if (p.type === 'youtube') {
+        playYouTube(p.ytUrl);
+        nowPlaying.textContent = `Playing YouTube audio`;
+        return;
+      }
+      currentTrackIndex = 0;
+      playTrack();
+    }
+
+    function stepPrev() {
+      const p = playlists[currentPlaylistIndex];
+      if (!p || p.type !== 'files') return;
+      currentTrackIndex = Math.max(0, currentTrackIndex - 1);
+      playTrack();
+    }
+
+    function stepNext() {
+      const p = playlists[currentPlaylistIndex];
+      if (!p || p.type !== 'files') return;
+      if (p.shuffle) {
+        currentTrackIndex = Math.floor(Math.random() * p.files.length);
+      } else {
+        currentTrackIndex++;
+      }
       playTrack();
     }
 
@@ -496,18 +674,21 @@
       const p = playlists[currentPlaylistIndex];
       if (!p) return;
 
-      const order = p.shuffle
-        ? shuffledOrder
-        : [...Array(p.files.length).keys()];
+      if (p.type === 'youtube') {
+        playYouTube(p.ytUrl);
+        nowPlaying.textContent = `Playing YouTube audio`;
+        return;
+      }
 
-      if (order.length === 0) {
+      const files = p.files;
+      if (!files || files.length === 0) {
         nowPlaying.textContent = '';
         audioPlayer.pause();
         audioPlayer.src = '';
         return;
       }
 
-      if (currentTrackIndex >= order.length) {
+      if (currentTrackIndex >= files.length) {
         if (p.loop) {
           currentTrackIndex = 0;
         } else {
@@ -517,34 +698,73 @@
         }
       }
 
-      const fileIndex = order[currentTrackIndex];
-      const file = p.files[fileIndex];
+      const file = files[currentTrackIndex];
       const url = URL.createObjectURL(file);
       audioPlayer.src = url;
       audioPlayer.play();
       nowPlaying.textContent = `Now Playing: ${file.name}`;
 
       audioPlayer.onended = () => {
-        currentTrackIndex++;
+        // Shuffle fix: pick random track each time, else sequential
+        if (p.shuffle) {
+          currentTrackIndex = Math.floor(Math.random() * files.length);
+        } else {
+          currentTrackIndex++;
+        }
         playTrack();
       };
     }
 
-    /* Load metadata (names, loop/shuffle) on start */
+    /* YouTube "audio-only" embed (no API key). It uses iframe playback.
+       Note: Autoplay may require a user gesture. */
+    let ytContainer = null;
+    function playYouTube(url) {
+      const id = extractYouTubeId(url);
+      if (!id) return;
+
+      if (!ytContainer) {
+        ytContainer = document.createElement('div');
+        ytContainer.className = 'yt-audio';
+        document.body.appendChild(ytContainer);
+      }
+      ytContainer.innerHTML = '';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&mute=0`;
+      iframe.allow = 'autoplay; encrypted-media';
+      iframe.setAttribute('frameborder', '0');
+      ytContainer.appendChild(iframe);
+    }
+
+    function extractYouTubeId(url) {
+      try {
+        const u = new URL(url);
+        if (u.hostname.includes('youtube.com')) {
+          return u.searchParams.get('v');
+        }
+        if (u.hostname.includes('youtu.be')) {
+          return u.pathname.split('/')[1];
+        }
+        return null;
+      } catch { return null; }
+    }
+
+    /* Load metadata (names, loop/shuffle/type) on start */
     window.addEventListener('DOMContentLoaded', () => {
       const meta = loadMeta();
       if (meta.length > 0) {
         playlists = meta.map((m, i) => ({
           name: m.name || `Playlist ${i + 1}`,
+          type: m.type || 'files',
           files: [],
+          ytUrl: m.ytUrl || null,
           loop: !!m.loop,
           shuffle: !!m.shuffle
         }));
         renderPlaylists();
-        // Keep startup visible until a playlist gets files
         startup.classList.remove('hidden');
         audioPlayer.style.display = 'none';
         nowPlaying.style.display = 'none';
+        resizeCardsForCount();
       } else {
         startup.classList.remove('hidden');
         audioPlayer.style.display = 'none';
@@ -554,9 +774,7 @@
 
     /* Close popup when clicking backdrop */
     popup.addEventListener('click', (e) => {
-      if (e.target === popup) {
-        popup.classList.add('hidden');
-      }
+      if (e.target === popup) popup.classList.add('hidden');
     });
   </script>
 </body>
