@@ -11,7 +11,6 @@
       --red: #d60000;
       --red-d: #a00000;
       --text: #111111;
-      --muted: #666;
     }
     * { box-sizing: border-box; }
     body {
@@ -20,6 +19,7 @@
       background: var(--bg);
       color: #fff;
     }
+
     header {
       height: 64px;
       background: var(--red);
@@ -36,20 +36,13 @@
     .startup {
       display: grid;
       place-items: center;
-      min-height: calc(100vh - 64px);
+      height: calc(100vh - 64px);
       text-align: center;
-      padding: 20px;
+      padding: 16px;
     }
     .title-big { font-size: 42px; font-weight: 900; }
     .subtitle { color: #cfcfcf; margin: 8px 0 18px; }
 
-    .choice-row {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
     .pill-btn {
       padding: 10px 20px;
       border-radius: 999px;
@@ -62,148 +55,66 @@
     .btn-secondary { background: #fff; color: var(--red); border: 2px solid var(--red); }
     .btn-secondary:hover { background: #f6f6f6; }
 
-    main.canvas { padding: 24px; max-width: 1200px; margin: 0 auto; }
+    main.canvas { padding: 20px; max-width: 1000px; margin: 0 auto; }
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
     }
-
     .playlist-card {
       background: var(--card);
       color: var(--text);
       border: 2px solid var(--red);
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.28);
-      position: relative;
-      user-select: none;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
     }
-    .playlist-card.single-expand {
-      min-height: calc(100vh - 64px - 80px);
-      width: 100%;
-    }
-    .playlist-card[draggable="true"] { cursor: grab; }
-    .playlist-card.dragging { opacity: 0.85; cursor: grabbing; }
 
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 6px;
     }
-    .card-title { font-weight: 900; color: var(--red); font-size: 20px; }
-    .toggle-btn { margin-left: 8px; }
-
+    .card-title { font-weight: 900; color: var(--red); }
     .file-list {
       display: none;
-      margin-top: 10px;
+      margin-top: 8px;
     }
     .file-item {
       font-size: 14px;
-      margin: 4px 0;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: move;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      margin: 3px 0;
+      padding: 4px 6px;
+      border-radius: 6px;
+      cursor: pointer;
     }
     .file-item:hover {
       background: #000;
       color: #fff;
     }
-    .row-left { display: inline-flex; align-items: center; gap: 8px; }
-    .drag-handle { color: var(--muted); font-size: 14px; cursor: move; user-select: none; }
 
     .card-controls {
-      margin-top: 12px;
+      margin-top: 10px;
       display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
       flex-wrap: wrap;
-    }
-    .group {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .icon-btn {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      border: 2px solid var(--red);
-      background: #fff;
-      color: var(--red);
-      font-size: 18px;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
+      gap: 6px;
       justify-content: center;
     }
-    .icon-btn.primary {
-      background: var(--red);
-      color: #fff;
-      border-color: var(--red);
-    }
-    .icon-btn:hover { filter: brightness(0.95); }
 
     .player-wrap {
-      max-width: 1000px;
+      max-width: 900px;
       margin: 10px auto 30px;
       text-align: center;
     }
     .now-playing { display: none; margin: 10px 0; }
-    audio { display: none; width: 95%; max-width: 1000px; }
+    audio { display: none; width: 95%; max-width: 900px; }
 
     .hidden { display: none !important; }
-
-    .popup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: grid;
-      place-items: center;
-      z-index: 1000;
-    }
-    .popup-content {
-      background: #fff;
-      color: #111;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      width: 340px;
-    }
-    .popup-content h3 { margin: 0; }
-    .popup-content input {
-      width: 94%;
-      padding: 10px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    .popup-actions {
-      margin-top: 14px;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .yt-audio {
-      width: 0;
-      height: 0;
-      opacity: 0;
-      pointer-events: none;
-      position: absolute;
-      left: -9999px;
-      top: -9999px;
-    }
   </style>
 </head>
 <body>
   <header>
-    <svg class="music-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg class="music-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
       <path d="M48 6v36.2c-2.4-1.4-5.2-2.2-8-2.2-7.2 0-13 5.8-13 13s5.8 13 13 13 13-5.8 13-13V18h10V6H48z" fill="#fff"/>
     </svg>
     Playify
@@ -212,11 +123,8 @@
   <section class="startup" id="startup">
     <div>
       <div class="title-big">Playify</div>
-      <p class="subtitle">Choose how you want to start your playlist.</p>
-      <div class="choice-row">
-        <button class="pill-btn btn-secondary" id="createYouTubeBtn">Use YouTube link</button>
-        <button class="pill-btn btn-primary" id="createPlaylistBtn">Create playlist (files)</button>
-      </div>
+      <p class="subtitle">Create your first playlist to get started.</p>
+      <label class="pill-btn btn-primary" for="newFileInput">Create playlist</label>
     </div>
   </section>
 
@@ -224,151 +132,85 @@
     <div class="cards" id="cards"></div>
   </main>
 
-  <input type="file" id="newFileInput" multiple accept="audio/*" class="hidden" />
-  <input type="file" id="addFileInput" multiple accept="audio/*" class="hidden" />
+  <input type="file" id="newFileInput" multiple accept="audio/*" />
+  <input type="file" id="addFileInput" multiple accept="audio/*" />
 
   <div class="player-wrap">
     <p class="now-playing" id="nowPlaying"></p>
     <audio id="audioPlayer" controls></audio>
   </div>
-
-  <div class="popup hidden" id="popup">
-    <div class="popup-content">
-      <h3 id="popupTitle">Name your playlist</h3>
-      <input type="text" id="popupInput" placeholder="My Playlist" />
-      <div class="popup-actions">
-        <button class="pill-btn btn-primary" id="popupConfirmBtn">Save</button>
-        <button class="pill-btn btn-secondary" id="popupCancelBtn">Cancel</button>
-      </div>
-    </div>
-  </div>
-    <script>
-    /* Elements */
+  <script>
     const startup = document.getElementById('startup');
-    const createPlaylistBtn = document.getElementById('createPlaylistBtn');
-    const createYouTubeBtn = document.getElementById('createYouTubeBtn');
     const cardsContainer = document.getElementById('cards');
     const newFileInput = document.getElementById('newFileInput');
     const addFileInput = document.getElementById('addFileInput');
     const audioPlayer = document.getElementById('audioPlayer');
     const nowPlaying = document.getElementById('nowPlaying');
-    const popup = document.getElementById('popup');
-    const popupTitle = document.getElementById('popupTitle');
-    const popupInput = document.getElementById('popupInput');
-    const popupConfirmBtn = document.getElementById('popupConfirmBtn');
-    const popupCancelBtn = document.getElementById('popupCancelBtn');
 
-    /* State */
-    let playlists = []; // { name, type: 'files'|'youtube', files: File[], ytUrl?: string, loop, shuffle }
+    let playlists = [];
     let currentPlaylistIndex = null;
     let currentTrackIndex = 0;
+    let shuffledOrder = [];
 
-    /* LocalStorage (metadata only) */
     const LS_KEY = 'playify_meta';
+
     function saveMeta() {
       const meta = playlists.map(p => ({
         name: p.name,
-        type: p.type,
         loop: p.loop,
-        shuffle: p.shuffle,
-        ytUrl: p.ytUrl || null
+        shuffle: p.shuffle
       }));
       localStorage.setItem(LS_KEY, JSON.stringify(meta));
     }
+
     function loadMeta() {
       try {
         const raw = localStorage.getItem(LS_KEY);
         return raw ? JSON.parse(raw) : [];
-      } catch { return []; }
+      } catch {
+        return [];
+      }
     }
+
     function addUniqueFiles(existing, incoming) {
       const seen = new Set(existing.map(f => `${f.name}|${f.size}|${f.lastModified}`));
-      const out = [];
-      for (const f of incoming) {
+      return incoming.filter(f => {
         const key = `${f.name}|${f.size}|${f.lastModified}`;
-        if (!seen.has(key)) { seen.add(key); out.push(f); }
-      }
-      return out;
-    }
-    createPlaylistBtn.addEventListener('click', () => {
-      popup.classList.remove('hidden');
-      popupTitle.textContent = 'Name your playlist';
-      popupInput.placeholder = 'My Playlist';
-      popupInput.value = '';
-      popupConfirmBtn.onclick = handleCreateFilesPlaylist;
-    });
-
-    function handleCreateFilesPlaylist() {
-      const name = popupInput.value.trim() || `Playlist ${playlists.length + 1}`;
-      popup.classList.add('hidden');
-      newFileInput.addEventListener('change', function onNewFiles() {
-        const selection = Array.from(newFileInput.files);
-        const unique = addUniqueFiles([], selection);
-        if (unique.length > 0) {
-          playlists.push({ name, type: 'files', files: unique, loop: false, shuffle: false });
-          renderPlaylists();
-          postCreateReveal();
-          saveMeta();
-        }
-        newFileInput.value = '';
-        newFileInput.removeEventListener('change', onNewFiles);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
       });
-      newFileInput.click();
     }
-    createYouTubeBtn.addEventListener('click', () => {
-      popup.classList.remove('hidden');
-      popupTitle.textContent = 'Enter a YouTube URL';
-      popupInput.placeholder = 'https://www.youtube.com/watch?v=...';
-      popupInput.value = '';
-      popupConfirmBtn.onclick = handleCreateYouTubePlaylist;
-    });
 
-    function handleCreateYouTubePlaylist() {
-      const url = popupInput.value.trim();
-      if (!url) { popup.classList.add('hidden'); return; }
-      playlists.push({
-        name: 'YouTube',
-        type: 'youtube',
-        ytUrl: url,
-        files: [],
-        loop: false,
-        shuffle: false
-      });
-      popup.classList.add('hidden');
+    newFileInput.addEventListener('change', () => {
+      const selection = Array.from(newFileInput.files);
+      if (selection.length === 0) return;
+      const unique = addUniqueFiles([], selection);
+      const name = `Playlist ${playlists.length + 1}`;
+      playlists.push({ name, files: unique, loop: false, shuffle: false });
       renderPlaylists();
-      postCreateReveal();
-      saveMeta();
-    }
-    function postCreateReveal() {
       startup.classList.add('hidden');
       audioPlayer.style.display = 'block';
       nowPlaying.style.display = 'block';
-      resizeCardsForCount();
-    }
-    function resizeCardsForCount() {
-      const count = playlists.length;
-      const cards = cardsContainer.querySelectorAll('.playlist-card');
-      cards.forEach(card => {
-        if (count === 1) card.classList.add('single-expand');
-        else card.classList.remove('single-expand');
-      });
-    }
+      newFileInput.value = '';
+      saveMeta();
+    });
+
     function renderPlaylists() {
       cardsContainer.innerHTML = '';
       playlists.forEach((p, index) => {
         const card = document.createElement('div');
         card.className = 'playlist-card';
 
-        /* Header */
         const header = document.createElement('div');
         header.className = 'card-header';
 
         const title = document.createElement('div');
         title.className = 'card-title';
-        title.textContent = p.type === 'youtube' ? `${p.name} (YouTube)` : p.name;
+        title.textContent = p.name;
 
         const toggle = document.createElement('button');
-        toggle.className = 'pill-btn btn-secondary toggle-btn';
+        toggle.className = 'pill-btn btn-secondary';
         toggle.textContent = 'Show';
         toggle.onclick = () => {
           list.style.display = list.style.display === 'none' ? 'block' : 'none';
@@ -377,180 +219,118 @@
 
         header.appendChild(title);
         header.appendChild(toggle);
+
         const list = document.createElement('div');
         list.className = 'file-list';
-        if (p.type === 'files') {
-          updateFileList(list, p.files, index);
-        } else {
-          const item = document.createElement('div');
-          item.className = 'file-item';
-          item.innerHTML = `<span class="row-left"><span class="drag-handle">⋮⋮</span><span>YouTube link</span></span><span>${escapeHtml(p.ytUrl || '')}</span>`;
-          item.style.cursor = 'default';
-          item.draggable = false;
-          list.appendChild(item);
-        }
+        updateFileList(list, p.files);
+
         const controls = document.createElement('div');
         controls.className = 'card-controls';
 
-        const groupPlay = document.createElement('div'); groupPlay.className = 'group';
-        const groupModes = document.createElement('div'); groupModes.className = 'group';
-        const groupActions = document.createElement('div'); groupActions.className = 'group';
-
-        const playBtn = makeIconBtn('▶️', true, () => playPlaylist(index));
-        const backBtn = makeIconBtn('⏮️', false, () => { if (currentPlaylistIndex === index) { stepPrev(); } });
-        const skipBtn = makeIconBtn('⏭️', false, () => { if (currentPlaylistIndex === index) { stepNext(); } });
-
-        const loopBtn = makeIconBtn('🔁', false, () => { p.loop = !p.loop; loopBtn.style.opacity = p.loop ? '1' : '0.5'; saveMeta(); });
-        loopBtn.style.opacity = p.loop ? '1' : '0.5';
-
-        const shuffleBtn = makeIconBtn('🔀', false, () => { p.shuffle = !p.shuffle; shuffleBtn.style.opacity = p.shuffle ? '1' : '0.5'; saveMeta(); });
-        shuffleBtn.style.opacity = p.shuffle ? '1' : '0.5';
-
-        const renameBtn = makeIconBtn('📝', false, () => {
-          const newName = prompt('Rename playlist:', p.name);
-          if (!newName) return;
-          p.name = newName.trim();
-          renderPlaylists(); saveMeta();
+        const playBtn = makeBtn('▶️', () => playPlaylist(index));
+        const backBtn = makeBtn('⏮️', () => {
+          if (currentPlaylistIndex === index && currentTrackIndex > 0) {
+            currentTrackIndex--;
+            playTrack();
+          }
         });
-
-        const addBtn = makeIconBtn('➕', false, () => {
-          if (p.type !== 'files') return;
+        const skipBtn = makeBtn('⏭️', () => {
+          if (currentPlaylistIndex === index && currentTrackIndex < p.files.length - 1) {
+            currentTrackIndex++;
+            playTrack();
+          }
+        });
+        const loopBtn = makeBtn(p.loop ? '🔁 On' : '🔁 Off', () => {
+          p.loop = !p.loop;
+          loopBtn.textContent = p.loop ? '🔁 On' : '🔁 Off';
+          saveMeta();
+        });
+        const shuffleBtn = makeBtn(p.shuffle ? '🔀 On' : '🔀 Off', () => {
+          p.shuffle = !p.shuffle;
+          shuffleBtn.textContent = p.shuffle ? '🔀 On' : '🔀 Off';
+          saveMeta();
+        });
+        const renameBtn = makeBtn('📝', () => {
+          const newName = prompt('Rename playlist:', p.name);
+          if (newName) {
+            p.name = newName.trim();
+            renderPlaylists();
+            saveMeta();
+          }
+        });
+        const addBtn = makeBtn('➕', () => {
           currentPlaylistIndex = index;
           addFileInput.click();
         });
-
-        const delBtn = makeIconBtn('🗑️', false, () => {
+        const delBtn = makeBtn('🗑️', () => {
           playlists.splice(index, 1);
           renderPlaylists();
-          resizeCardsForCount();
           if (playlists.length === 0) {
             startup.classList.remove('hidden');
             audioPlayer.style.display = 'none';
             nowPlaying.style.display = 'none';
             nowPlaying.textContent = '';
-            audioPlayer.pause(); audioPlayer.src = '';
+            audioPlayer.pause();
+            audioPlayer.src = '';
           }
           saveMeta();
         });
 
-        groupPlay.append(playBtn, backBtn, skipBtn);
-        groupModes.append(loopBtn, shuffleBtn);
-        groupActions.append(renameBtn, addBtn, delBtn);
-
-        controls.append(groupPlay, groupModes, groupActions);
-
+        controls.append(playBtn, backBtn, skipBtn, loopBtn, shuffleBtn, renameBtn, addBtn, delBtn);
         card.append(header, list, controls);
         cardsContainer.appendChild(card);
-        list.style.display = 'block';
       });
-
-      resizeCardsForCount();
     }
 
-    function makeIconBtn(label, primary, action) {
+    function makeBtn(label, action) {
       const btn = document.createElement('button');
-      btn.className = 'icon-btn' + (primary ? ' primary' :      btn.textContent = label;
+      btn.className = 'pill-btn btn-secondary';
+      btn.textContent = label;
       btn.onclick = action;
       return btn;
     }
 
-    /* Build file list with drag-and-drop + per-file delete */
-    function updateFileList(container, files, playlistIndex) {
+    function updateFileList(container, files) {
       container.innerHTML = '';
       files.forEach((f, i) => {
         const item = document.createElement('div');
         item.className = 'file-item';
-        item.draggable = true;
-        item.dataset.index = i;
-
-        const left = document.createElement('span');
-        left.className = 'row-left';
-        const handle = document.createElement('span');
-        handle.className = 'drag-handle';
-        handle.textContent = '⋮⋮';
-        const name = document.createElement('span');
-        name.textContent = `${i + 1}. ${f.name}`;
-        left.append(handle, name);
-
-        const deleteBtn = document.createElement('span');
-        deleteBtn.textContent = '🗑️';
-        deleteBtn.title = 'Delete file';
-        deleteBtn.style.cursor = 'pointer';
-        deleteBtn.onclick = (e) => {
-          e.stopPropagation();
-          const list = playlists[playlistIndex].files;
-          list.splice(i, 1);
-          renderPlaylists();
-        };
-
-        item.append(left, deleteBtn);
-
-        item.addEventListener('click', () => {
-          currentPlaylistIndex = playlistIndex;
+        item.textContent = `${i + 1}. ${f.name}`;
+        item.onclick = () => {
           currentTrackIndex = i;
           playTrack();
-        });
-
-        item.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', i);
-        });
-        item.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          item.style.background = '#000';
-          item.style.color = '#fff';
-        });
-        item.addEventListener('dragleave', () => {
-          item.style.background = '';
-          item.style.color = '';
-        });
-        item.addEventListener('drop', (e) => {
-          e.preventDefault();
-          const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
-          const to = parseInt(item.dataset.index, 10);
-          const listRef = playlists[playlistIndex].files;
-          const moved = listRef.splice(from, 1)[0];
-          listRef.splice(to, 0, moved);
-          renderPlaylists();
-        });
-
+        };
         container.appendChild(item);
       });
     }
-    let shuffleQueue = [];
+
+    addFileInput.addEventListener('change', () => {
+      if (currentPlaylistIndex === null) return;
+      const selection = Array.from(addFileInput.files);
+      if (selection.length === 0) return;
+      const p = playlists[currentPlaylistIndex];
+      const unique = addUniqueFiles(p.files, selection);
+      p.files.push(...unique);
+      renderPlaylists();
+      const card = cardsContainer.children[currentPlaylistIndex];
+      if (card) {
+        const toggle = card.querySelector('.pill-btn.btn-secondary');
+        const list = card.querySelector('.file-list');
+        if (list && toggle) {
+          list.style.display = 'block';
+          toggle.textContent = 'Hide';
+        }
+      }
+      addFileInput.value = '';
+      saveMeta();
+    });
 
     function playPlaylist(index) {
       currentPlaylistIndex = index;
-      const p = playlists[index];
-      if (p.type === 'youtube') {
-        playYouTube(p.ytUrl);
-        nowPlaying.textContent = `Playing YouTube audio`;
-        return;
-      }
       currentTrackIndex = 0;
-      shuffleQueue = p.shuffle ? generateShuffleQueue(p.files.length) : [];
-      playTrack();
-    }
-
-    function generateShuffleQueue(length) {
-      const indices = [...Array(length).keys()];
-      for (let i = indices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
-      }
-      return indices;
-    }
-
-    function stepPrev() {
-      const p = playlists[currentPlaylistIndex];
-      if (!p || p.type !== 'files') return;
-      currentTrackIndex = Math.max(0, currentTrackIndex - 1);
-      playTrack();
-    }
-
-    function stepNext() {
-      const p = playlists[currentPlaylistIndex];
-      if (!p || p.type !== 'files') return;
-      currentTrackIndex++;
+      shuffledOrder = playlists[index].shuffle
+        ? [...Array(playlists[index].files.length).keys()].sort(() => Math.random() - 0.5)
+        : [];
       playTrack();
     }
 
@@ -558,47 +338,19 @@
       const p = playlists[currentPlaylistIndex];
       if (!p) return;
 
-      if (p.type === 'youtube') {
-        playYouTube(p.ytUrl);
-        nowPlaying.textContent = `Playing YouTube audio`;
-        return;
-      }
-
-      const files = p.files;
-      if (!files || files.length === 0) {
-        nowPlaying.textContent = '';
-        audioPlayer.pause();
-        audioPlayer.src = '';
-        return;
-      }
-
-      let indexToPlay;
-      if (p.shuffle) {
-        if (currentTrackIndex >= shuffleQueue.length) {
-          if (p.loop) {
-            shuffleQueue = generateShuffleQueue(files.length);
-            currentTrackIndex = 0;
-          } else {
-            nowPlaying.textContent = '';
-            audioPlayer.pause();
-            return;
-          }
+      const order = p.shuffle ? shuffledOrder : [...Array(p.files.length).keys()];
+      if (currentTrackIndex >= order.length) {
+        if (p.loop && p.files.length > 0) {
+          currentTrackIndex = 0;
+        } else {
+          nowPlaying.textContent = '';
+          audioPlayer.pause();
+          return;
         }
-        indexToPlay = shuffleQueue[currentTrackIndex];
-      } else {
-        if (currentTrackIndex >= files.length) {
-          if (p.loop) {
-            currentTrackIndex = 0;
-          } else {
-            nowPlaying.textContent = '';
-            audioPlayer.pause();
-            return;
-          }
-        }
-        indexToPlay = currentTrackIndex;
       }
 
-      const file = files[indexToPlay];
+      const fileIndex = order[currentTrackIndex];
+      const file = p.files[fileIndex];
       const url = URL.createObjectURL(file);
       audioPlayer.src = url;
       audioPlayer.play();
@@ -609,47 +361,13 @@
         playTrack();
       };
     }
-    let ytContainer = null;
-    function playYouTube(url) {
-      const id = extractYouTubeId(url);
-      if (!id) {
-        nowPlaying.textContent = 'Invalid YouTube link';
-        return;
-      }
-      if (!ytContainer) {
-        ytContainer = document.createElement('div');
-        ytContainer.className = 'yt-audio';
-        document.body.appendChild(ytContainer);
-      }
-      ytContainer.innerHTML = '';
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&mute=0`;
-      iframe.allow = 'autoplay; encrypted-media';
-      iframe.setAttribute('frameborder', '0');
-      ytContainer.appendChild(iframe);
-    }
 
-    function extractYouTubeId(url) {
-      try {
-        const u = new URL(url);
-        if (u.hostname.includes('youtube.com')) {
-          return u.searchParams.get('v');
-        }
-        if (u.hostname.includes('youtu.be')) {
-          return u.pathname.split('/')[1];
-        }
-        return null;
-      } catch { return null; }
-    }
-    /* Lifecycle */
     window.addEventListener('DOMContentLoaded', () => {
       const meta = loadMeta();
       if (meta.length > 0) {
         playlists = meta.map((m, i) => ({
           name: m.name || `Playlist ${i + 1}`,
-          type: m.type || 'files',
           files: [],
-          ytUrl: m.ytUrl || null,
           loop: !!m.loop,
           shuffle: !!m.shuffle
         }));
@@ -657,27 +375,12 @@
         startup.classList.remove('hidden');
         audioPlayer.style.display = 'none';
         nowPlaying.style.display = 'none';
-        resizeCardsForCount();
       } else {
         startup.classList.remove('hidden');
         audioPlayer.style.display = 'none';
         nowPlaying.style.display = 'none';
       }
     });
-
-    popup.addEventListener('click', (e) => {
-      if (e.target === popup) popup.classList.add('hidden');
-    });
-
-    popupCancelBtn.addEventListener('click', () => {
-      popup.classList.add('hidden');
-    });
-
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, s => ({
-        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-      }[s]));
-    }
   </script>
 </body>
 </html>
